@@ -1,0 +1,49 @@
+version: "3"
+
+networks:
+  www-net:
+    driver: bridge
+
+services:
+  php:
+    container_name: php
+    build:
+      dockerfile: Dockerfile
+      context: ./_docker/images/php7.3
+    hostname: php
+    restart: always
+    networks:
+      - www-net
+    volumes:
+      - ./home/www:/home/www
+
+  nginx:
+    container_name: nginx
+    image: nginx
+    hostname: nginx
+    restart: always
+    networks:
+      - www-net
+    volumes:
+      - ./home/www:/home/www
+      - ./etc/nginx/conf.d/phambinh.conf:/etc/nginx/conf.d/phambinh.conf
+    ports:
+      - "80:80"
+      - "443:443"
+
+  mysql:
+    container_name: mysql
+    image: mysql
+    hostname: mysql
+    restart: always
+    networks:
+      - www-net
+    volumes:
+      - ./var/lib/mysql:/var/lib/mysql
+      - ./etc/mysql/my.cnf:/etc/mysql/mysql.cnf
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=phambinh_net
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=user
+
